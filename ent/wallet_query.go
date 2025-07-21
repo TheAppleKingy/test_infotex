@@ -458,7 +458,9 @@ func (wq *WalletQuery) loadSentTransactions(ctx context.Context, query *Transact
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(transaction.FieldFromWalletID)
+	}
 	query.Where(predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(wallet.SentTransactionsColumn), fks...))
 	}))
@@ -467,13 +469,10 @@ func (wq *WalletQuery) loadSentTransactions(ctx context.Context, query *Transact
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.wallet_sent_transactions
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "wallet_sent_transactions" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.FromWalletID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "wallet_sent_transactions" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "from_wallet_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -489,7 +488,9 @@ func (wq *WalletQuery) loadRecievedTransactions(ctx context.Context, query *Tran
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(transaction.FieldToWalletID)
+	}
 	query.Where(predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(wallet.RecievedTransactionsColumn), fks...))
 	}))
@@ -498,13 +499,10 @@ func (wq *WalletQuery) loadRecievedTransactions(ctx context.Context, query *Tran
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.wallet_recieved_transactions
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "wallet_recieved_transactions" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.ToWalletID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "wallet_recieved_transactions" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "to_wallet_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

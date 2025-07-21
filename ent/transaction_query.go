@@ -25,7 +25,6 @@ type TransactionQuery struct {
 	predicates     []predicate.Transaction
 	withFromWallet *WalletQuery
 	withToWallet   *WalletQuery
-	withFKs        bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -334,7 +333,7 @@ func (tq *TransactionQuery) WithToWallet(opts ...func(*WalletQuery)) *Transactio
 // Example:
 //
 //	var v []struct {
-//		Amount uint `json:"amount,omitempty"`
+//		Amount int `json:"amount,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -357,7 +356,7 @@ func (tq *TransactionQuery) GroupBy(field string, fields ...string) *Transaction
 // Example:
 //
 //	var v []struct {
-//		Amount uint `json:"amount,omitempty"`
+//		Amount int `json:"amount,omitempty"`
 //	}
 //
 //	client.Transaction.Query().
@@ -405,19 +404,12 @@ func (tq *TransactionQuery) prepareQuery(ctx context.Context) error {
 func (tq *TransactionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Transaction, error) {
 	var (
 		nodes       = []*Transaction{}
-		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
 		loadedTypes = [2]bool{
 			tq.withFromWallet != nil,
 			tq.withToWallet != nil,
 		}
 	)
-	if tq.withFromWallet != nil || tq.withToWallet != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, transaction.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Transaction).scanValues(nil, columns)
 	}
@@ -455,10 +447,7 @@ func (tq *TransactionQuery) loadFromWallet(ctx context.Context, query *WalletQue
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Transaction)
 	for i := range nodes {
-		if nodes[i].wallet_sent_transactions == nil {
-			continue
-		}
-		fk := *nodes[i].wallet_sent_transactions
+		fk := nodes[i].FromWalletID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -475,7 +464,7 @@ func (tq *TransactionQuery) loadFromWallet(ctx context.Context, query *WalletQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "wallet_sent_transactions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "from_wallet_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -487,10 +476,7 @@ func (tq *TransactionQuery) loadToWallet(ctx context.Context, query *WalletQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Transaction)
 	for i := range nodes {
-		if nodes[i].wallet_recieved_transactions == nil {
-			continue
-		}
-		fk := *nodes[i].wallet_recieved_transactions
+		fk := nodes[i].ToWalletID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -507,7 +493,7 @@ func (tq *TransactionQuery) loadToWallet(ctx context.Context, query *WalletQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "wallet_recieved_transactions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "to_wallet_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -540,6 +526,12 @@ func (tq *TransactionQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != transaction.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if tq.withFromWallet != nil {
+			_spec.Node.AddColumnOnce(transaction.FieldFromWalletID)
+		}
+		if tq.withToWallet != nil {
+			_spec.Node.AddColumnOnce(transaction.FieldToWalletID)
 		}
 	}
 	if ps := tq.predicates; len(ps) > 0 {

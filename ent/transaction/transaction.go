@@ -18,6 +18,10 @@ const (
 	FieldAmount = "amount"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldFromWalletID holds the string denoting the from_wallet_id field in the database.
+	FieldFromWalletID = "from_wallet_id"
+	// FieldToWalletID holds the string denoting the to_wallet_id field in the database.
+	FieldToWalletID = "to_wallet_id"
 	// EdgeFromWallet holds the string denoting the from_wallet edge name in mutations.
 	EdgeFromWallet = "from_wallet"
 	// EdgeToWallet holds the string denoting the to_wallet edge name in mutations.
@@ -30,14 +34,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "wallet" package.
 	FromWalletInverseTable = "wallets"
 	// FromWalletColumn is the table column denoting the from_wallet relation/edge.
-	FromWalletColumn = "wallet_sent_transactions"
+	FromWalletColumn = "from_wallet_id"
 	// ToWalletTable is the table that holds the to_wallet relation/edge.
 	ToWalletTable = "transactions"
 	// ToWalletInverseTable is the table name for the Wallet entity.
 	// It exists in this package in order to avoid circular dependency with the "wallet" package.
 	ToWalletInverseTable = "wallets"
 	// ToWalletColumn is the table column denoting the to_wallet relation/edge.
-	ToWalletColumn = "wallet_recieved_transactions"
+	ToWalletColumn = "to_wallet_id"
 )
 
 // Columns holds all SQL columns for transaction fields.
@@ -45,13 +49,8 @@ var Columns = []string{
 	FieldID,
 	FieldAmount,
 	FieldCreatedAt,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "transactions"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"wallet_sent_transactions",
-	"wallet_recieved_transactions",
+	FieldFromWalletID,
+	FieldToWalletID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -61,17 +60,12 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
 	// AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	AmountValidator func(uint) error
+	AmountValidator func(int) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )
@@ -92,6 +86,16 @@ func ByAmount(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByFromWalletID orders the results by the from_wallet_id field.
+func ByFromWalletID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFromWalletID, opts...).ToFunc()
+}
+
+// ByToWalletID orders the results by the to_wallet_id field.
+func ByToWalletID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldToWalletID, opts...).ToFunc()
 }
 
 // ByFromWalletField orders the results by from_wallet field.

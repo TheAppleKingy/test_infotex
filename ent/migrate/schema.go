@@ -11,10 +11,10 @@ var (
 	// TransactionsColumns holds the columns for the "transactions" table.
 	TransactionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "amount", Type: field.TypeUint},
+		{Name: "amount", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "wallet_sent_transactions", Type: field.TypeInt},
-		{Name: "wallet_recieved_transactions", Type: field.TypeInt},
+		{Name: "from_wallet_id", Type: field.TypeInt},
+		{Name: "to_wallet_id", Type: field.TypeInt},
 	}
 	// TransactionsTable holds the schema information for the "transactions" table.
 	TransactionsTable = &schema.Table{
@@ -40,7 +40,7 @@ var (
 	WalletsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "address", Type: field.TypeString, Unique: true},
-		{Name: "balance", Type: field.TypeUint},
+		{Name: "balance", Type: field.TypeInt},
 	}
 	// WalletsTable holds the schema information for the "wallets" table.
 	WalletsTable = &schema.Table{

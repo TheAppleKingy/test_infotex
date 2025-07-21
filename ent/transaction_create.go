@@ -22,8 +22,8 @@ type TransactionCreate struct {
 }
 
 // SetAmount sets the "amount" field.
-func (tc *TransactionCreate) SetAmount(u uint) *TransactionCreate {
-	tc.mutation.SetAmount(u)
+func (tc *TransactionCreate) SetAmount(i int) *TransactionCreate {
+	tc.mutation.SetAmount(i)
 	return tc
 }
 
@@ -41,21 +41,21 @@ func (tc *TransactionCreate) SetNillableCreatedAt(t *time.Time) *TransactionCrea
 	return tc
 }
 
-// SetFromWalletID sets the "from_wallet" edge to the Wallet entity by ID.
-func (tc *TransactionCreate) SetFromWalletID(id int) *TransactionCreate {
-	tc.mutation.SetFromWalletID(id)
+// SetFromWalletID sets the "from_wallet_id" field.
+func (tc *TransactionCreate) SetFromWalletID(i int) *TransactionCreate {
+	tc.mutation.SetFromWalletID(i)
+	return tc
+}
+
+// SetToWalletID sets the "to_wallet_id" field.
+func (tc *TransactionCreate) SetToWalletID(i int) *TransactionCreate {
+	tc.mutation.SetToWalletID(i)
 	return tc
 }
 
 // SetFromWallet sets the "from_wallet" edge to the Wallet entity.
 func (tc *TransactionCreate) SetFromWallet(w *Wallet) *TransactionCreate {
 	return tc.SetFromWalletID(w.ID)
-}
-
-// SetToWalletID sets the "to_wallet" edge to the Wallet entity by ID.
-func (tc *TransactionCreate) SetToWalletID(id int) *TransactionCreate {
-	tc.mutation.SetToWalletID(id)
-	return tc
 }
 
 // SetToWallet sets the "to_wallet" edge to the Wallet entity.
@@ -117,6 +117,12 @@ func (tc *TransactionCreate) check() error {
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Transaction.created_at"`)}
 	}
+	if _, ok := tc.mutation.FromWalletID(); !ok {
+		return &ValidationError{Name: "from_wallet_id", err: errors.New(`ent: missing required field "Transaction.from_wallet_id"`)}
+	}
+	if _, ok := tc.mutation.ToWalletID(); !ok {
+		return &ValidationError{Name: "to_wallet_id", err: errors.New(`ent: missing required field "Transaction.to_wallet_id"`)}
+	}
 	if len(tc.mutation.FromWalletIDs()) == 0 {
 		return &ValidationError{Name: "from_wallet", err: errors.New(`ent: missing required edge "Transaction.from_wallet"`)}
 	}
@@ -150,7 +156,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		_spec = sqlgraph.NewCreateSpec(transaction.Table, sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt))
 	)
 	if value, ok := tc.mutation.Amount(); ok {
-		_spec.SetField(transaction.FieldAmount, field.TypeUint, value)
+		_spec.SetField(transaction.FieldAmount, field.TypeInt, value)
 		_node.Amount = value
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
@@ -171,7 +177,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.wallet_sent_transactions = &nodes[0]
+		_node.FromWalletID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.ToWalletIDs(); len(nodes) > 0 {
@@ -188,7 +194,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.wallet_recieved_transactions = &nodes[0]
+		_node.ToWalletID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

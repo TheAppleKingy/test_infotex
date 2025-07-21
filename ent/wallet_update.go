@@ -29,23 +29,23 @@ func (wu *WalletUpdate) Where(ps ...predicate.Wallet) *WalletUpdate {
 }
 
 // SetBalance sets the "balance" field.
-func (wu *WalletUpdate) SetBalance(u uint) *WalletUpdate {
+func (wu *WalletUpdate) SetBalance(i int) *WalletUpdate {
 	wu.mutation.ResetBalance()
-	wu.mutation.SetBalance(u)
+	wu.mutation.SetBalance(i)
 	return wu
 }
 
 // SetNillableBalance sets the "balance" field if the given value is not nil.
-func (wu *WalletUpdate) SetNillableBalance(u *uint) *WalletUpdate {
-	if u != nil {
-		wu.SetBalance(*u)
+func (wu *WalletUpdate) SetNillableBalance(i *int) *WalletUpdate {
+	if i != nil {
+		wu.SetBalance(*i)
 	}
 	return wu
 }
 
-// AddBalance adds u to the "balance" field.
-func (wu *WalletUpdate) AddBalance(u int) *WalletUpdate {
-	wu.mutation.AddBalance(u)
+// AddBalance adds i to the "balance" field.
+func (wu *WalletUpdate) AddBalance(i int) *WalletUpdate {
+	wu.mutation.AddBalance(i)
 	return wu
 }
 
@@ -153,7 +153,20 @@ func (wu *WalletUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (wu *WalletUpdate) check() error {
+	if v, ok := wu.mutation.Balance(); ok {
+		if err := wallet.BalanceValidator(v); err != nil {
+			return &ValidationError{Name: "balance", err: fmt.Errorf(`ent: validator failed for field "Wallet.balance": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (wu *WalletUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := wu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(wallet.Table, wallet.Columns, sqlgraph.NewFieldSpec(wallet.FieldID, field.TypeInt))
 	if ps := wu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -163,10 +176,10 @@ func (wu *WalletUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := wu.mutation.Balance(); ok {
-		_spec.SetField(wallet.FieldBalance, field.TypeUint, value)
+		_spec.SetField(wallet.FieldBalance, field.TypeInt, value)
 	}
 	if value, ok := wu.mutation.AddedBalance(); ok {
-		_spec.AddField(wallet.FieldBalance, field.TypeUint, value)
+		_spec.AddField(wallet.FieldBalance, field.TypeInt, value)
 	}
 	if wu.mutation.SentTransactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -279,23 +292,23 @@ type WalletUpdateOne struct {
 }
 
 // SetBalance sets the "balance" field.
-func (wuo *WalletUpdateOne) SetBalance(u uint) *WalletUpdateOne {
+func (wuo *WalletUpdateOne) SetBalance(i int) *WalletUpdateOne {
 	wuo.mutation.ResetBalance()
-	wuo.mutation.SetBalance(u)
+	wuo.mutation.SetBalance(i)
 	return wuo
 }
 
 // SetNillableBalance sets the "balance" field if the given value is not nil.
-func (wuo *WalletUpdateOne) SetNillableBalance(u *uint) *WalletUpdateOne {
-	if u != nil {
-		wuo.SetBalance(*u)
+func (wuo *WalletUpdateOne) SetNillableBalance(i *int) *WalletUpdateOne {
+	if i != nil {
+		wuo.SetBalance(*i)
 	}
 	return wuo
 }
 
-// AddBalance adds u to the "balance" field.
-func (wuo *WalletUpdateOne) AddBalance(u int) *WalletUpdateOne {
-	wuo.mutation.AddBalance(u)
+// AddBalance adds i to the "balance" field.
+func (wuo *WalletUpdateOne) AddBalance(i int) *WalletUpdateOne {
+	wuo.mutation.AddBalance(i)
 	return wuo
 }
 
@@ -416,7 +429,20 @@ func (wuo *WalletUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (wuo *WalletUpdateOne) check() error {
+	if v, ok := wuo.mutation.Balance(); ok {
+		if err := wallet.BalanceValidator(v); err != nil {
+			return &ValidationError{Name: "balance", err: fmt.Errorf(`ent: validator failed for field "Wallet.balance": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (wuo *WalletUpdateOne) sqlSave(ctx context.Context) (_node *Wallet, err error) {
+	if err := wuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(wallet.Table, wallet.Columns, sqlgraph.NewFieldSpec(wallet.FieldID, field.TypeInt))
 	id, ok := wuo.mutation.ID()
 	if !ok {
@@ -443,10 +469,10 @@ func (wuo *WalletUpdateOne) sqlSave(ctx context.Context) (_node *Wallet, err err
 		}
 	}
 	if value, ok := wuo.mutation.Balance(); ok {
-		_spec.SetField(wallet.FieldBalance, field.TypeUint, value)
+		_spec.SetField(wallet.FieldBalance, field.TypeInt, value)
 	}
 	if value, ok := wuo.mutation.AddedBalance(); ok {
-		_spec.AddField(wallet.FieldBalance, field.TypeUint, value)
+		_spec.AddField(wallet.FieldBalance, field.TypeInt, value)
 	}
 	if wuo.mutation.SentTransactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{

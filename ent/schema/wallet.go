@@ -13,7 +13,7 @@ type Wallet struct {
 func (Wallet) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("address").Immutable().NotEmpty().Unique(),
-		field.Uint("balance"),
+		field.Int("balance").NonNegative(),
 	}
 }
 

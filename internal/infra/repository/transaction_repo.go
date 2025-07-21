@@ -2,36 +2,36 @@ package repository
 
 import (
 	"test_infotex/ent"
-	"test_infotex/ent/transaction"
 	"test_infotex/internal/domain/entities"
-	"time"
 
 	"golang.org/x/net/context"
 )
 
 type TransactionRepo struct {
-	client *ent.Client
+	Client *ent.Client
 }
 
-func GetTransactionRepo(client *ent.Client) *TransactionRepo {
-	return &TransactionRepo{
-		client: client,
-	}
-}
-
-func (tRepo *TransactionRepo) GetByTimeRange(ctx context.Context, from_time time.Time, to_time time.Time) ([]entities.Transaction, error) {
-	transactions, err := tRepo.client.Transaction.Query().Where(transaction.CreatedAtLTE(to_time), transaction.CreatedAtGTE(from_time)).WithFromWallet().WithToWallet().All(ctx)
+func (tr *TransactionRepo) GetNLast(ctx context.Context, n int) ([]entities.Transaction, error) {
+	transactions, err := tr.Client.Transaction.Query().Order(ent.Desc("created_at")).Limit(n).WithFromWallet().WithToWallet().All(ctx)
 	if err != nil {
 		return []entities.Transaction{}, err
 	}
 	transactionsEntities := []entities.Transaction{}
 	for _, t := range transactions {
 		transactionsEntities = append(transactionsEntities, entities.Transaction{
-			ID:          uint(t.ID),
-			Amount:      t.Amount,
-			From_wallet: uint(t.Edges.FromWallet.ID),
-			To_wallet:   uint(t.Edges.ToWallet.ID),
+			ID:         t.ID,
+			Amount:     float64(t.Amount) / 100,
+			FromWallet: t.Edges.FromWallet.Address,
+			ToWallet:   t.Edges.ToWallet.Address,
+			CreatedAt:  t.CreatedAt,
 		})
 	}
 	return transactionsEntities, nil
+}
+
+func (tr *TransactionRepo) MakeTransaction(ctx context.Context, fromWallet int, toWallet int, amount int) error {
+	if _, err := tr.Client.Transaction.Create().SetFromWalletID(fromWallet).SetToWalletID(toWallet).SetAmount(amount).Save(ctx); err != nil {
+		return err
+	}
+	return nil
 }

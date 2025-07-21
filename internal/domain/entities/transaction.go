@@ -1,8 +1,11 @@
 package entities
 
+import "time"
+
 type Transaction struct {
-	ID          uint
-	Amount      uint
-	From_wallet uint
-	To_wallet   uint
+	ID         int
+	Amount     float64
+	FromWallet string
+	ToWallet   string
+	CreatedAt  time.Time
 }

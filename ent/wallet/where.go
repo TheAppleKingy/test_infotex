@@ -60,7 +60,7 @@ func Address(v string) predicate.Wallet {
 }
 
 // Balance applies equality check predicate on the "balance" field. It's identical to BalanceEQ.
-func Balance(v uint) predicate.Wallet {
+func Balance(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldEQ(FieldBalance, v))
 }
 
@@ -130,42 +130,42 @@ func AddressContainsFold(v string) predicate.Wallet {
 }
 
 // BalanceEQ applies the EQ predicate on the "balance" field.
-func BalanceEQ(v uint) predicate.Wallet {
+func BalanceEQ(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldEQ(FieldBalance, v))
 }
 
 // BalanceNEQ applies the NEQ predicate on the "balance" field.
-func BalanceNEQ(v uint) predicate.Wallet {
+func BalanceNEQ(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldNEQ(FieldBalance, v))
 }
 
 // BalanceIn applies the In predicate on the "balance" field.
-func BalanceIn(vs ...uint) predicate.Wallet {
+func BalanceIn(vs ...int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldIn(FieldBalance, vs...))
 }
 
 // BalanceNotIn applies the NotIn predicate on the "balance" field.
-func BalanceNotIn(vs ...uint) predicate.Wallet {
+func BalanceNotIn(vs ...int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldNotIn(FieldBalance, vs...))
 }
 
 // BalanceGT applies the GT predicate on the "balance" field.
-func BalanceGT(v uint) predicate.Wallet {
+func BalanceGT(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldGT(FieldBalance, v))
 }
 
 // BalanceGTE applies the GTE predicate on the "balance" field.
-func BalanceGTE(v uint) predicate.Wallet {
+func BalanceGTE(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldGTE(FieldBalance, v))
 }
 
 // BalanceLT applies the LT predicate on the "balance" field.
-func BalanceLT(v uint) predicate.Wallet {
+func BalanceLT(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldLT(FieldBalance, v))
 }
 
 // BalanceLTE applies the LTE predicate on the "balance" field.
-func BalanceLTE(v uint) predicate.Wallet {
+func BalanceLTE(v int) predicate.Wallet {
 	return predicate.Wallet(sql.FieldLTE(FieldBalance, v))
 }
 

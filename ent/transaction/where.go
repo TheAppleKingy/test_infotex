@@ -56,7 +56,7 @@ func IDLTE(id int) predicate.Transaction {
 }
 
 // Amount applies equality check predicate on the "amount" field. It's identical to AmountEQ.
-func Amount(v uint) predicate.Transaction {
+func Amount(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldEQ(FieldAmount, v))
 }
 
@@ -65,43 +65,53 @@ func CreatedAt(v time.Time) predicate.Transaction {
 	return predicate.Transaction(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// FromWalletID applies equality check predicate on the "from_wallet_id" field. It's identical to FromWalletIDEQ.
+func FromWalletID(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldEQ(FieldFromWalletID, v))
+}
+
+// ToWalletID applies equality check predicate on the "to_wallet_id" field. It's identical to ToWalletIDEQ.
+func ToWalletID(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldEQ(FieldToWalletID, v))
+}
+
 // AmountEQ applies the EQ predicate on the "amount" field.
-func AmountEQ(v uint) predicate.Transaction {
+func AmountEQ(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldEQ(FieldAmount, v))
 }
 
 // AmountNEQ applies the NEQ predicate on the "amount" field.
-func AmountNEQ(v uint) predicate.Transaction {
+func AmountNEQ(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldNEQ(FieldAmount, v))
 }
 
 // AmountIn applies the In predicate on the "amount" field.
-func AmountIn(vs ...uint) predicate.Transaction {
+func AmountIn(vs ...int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldIn(FieldAmount, vs...))
 }
 
 // AmountNotIn applies the NotIn predicate on the "amount" field.
-func AmountNotIn(vs ...uint) predicate.Transaction {
+func AmountNotIn(vs ...int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldNotIn(FieldAmount, vs...))
 }
 
 // AmountGT applies the GT predicate on the "amount" field.
-func AmountGT(v uint) predicate.Transaction {
+func AmountGT(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldGT(FieldAmount, v))
 }
 
 // AmountGTE applies the GTE predicate on the "amount" field.
-func AmountGTE(v uint) predicate.Transaction {
+func AmountGTE(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldGTE(FieldAmount, v))
 }
 
 // AmountLT applies the LT predicate on the "amount" field.
-func AmountLT(v uint) predicate.Transaction {
+func AmountLT(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldLT(FieldAmount, v))
 }
 
 // AmountLTE applies the LTE predicate on the "amount" field.
-func AmountLTE(v uint) predicate.Transaction {
+func AmountLTE(v int) predicate.Transaction {
 	return predicate.Transaction(sql.FieldLTE(FieldAmount, v))
 }
 
@@ -143,6 +153,46 @@ func CreatedAtLT(v time.Time) predicate.Transaction {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Transaction {
 	return predicate.Transaction(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// FromWalletIDEQ applies the EQ predicate on the "from_wallet_id" field.
+func FromWalletIDEQ(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldEQ(FieldFromWalletID, v))
+}
+
+// FromWalletIDNEQ applies the NEQ predicate on the "from_wallet_id" field.
+func FromWalletIDNEQ(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldNEQ(FieldFromWalletID, v))
+}
+
+// FromWalletIDIn applies the In predicate on the "from_wallet_id" field.
+func FromWalletIDIn(vs ...int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldIn(FieldFromWalletID, vs...))
+}
+
+// FromWalletIDNotIn applies the NotIn predicate on the "from_wallet_id" field.
+func FromWalletIDNotIn(vs ...int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldNotIn(FieldFromWalletID, vs...))
+}
+
+// ToWalletIDEQ applies the EQ predicate on the "to_wallet_id" field.
+func ToWalletIDEQ(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldEQ(FieldToWalletID, v))
+}
+
+// ToWalletIDNEQ applies the NEQ predicate on the "to_wallet_id" field.
+func ToWalletIDNEQ(v int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldNEQ(FieldToWalletID, v))
+}
+
+// ToWalletIDIn applies the In predicate on the "to_wallet_id" field.
+func ToWalletIDIn(vs ...int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldIn(FieldToWalletID, vs...))
+}
+
+// ToWalletIDNotIn applies the NotIn predicate on the "to_wallet_id" field.
+func ToWalletIDNotIn(vs ...int) predicate.Transaction {
+	return predicate.Transaction(sql.FieldNotIn(FieldToWalletID, vs...))
 }
 
 // HasFromWallet applies the HasEdge predicate on the "from_wallet" edge.

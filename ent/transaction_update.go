@@ -28,21 +28,37 @@ func (tu *TransactionUpdate) Where(ps ...predicate.Transaction) *TransactionUpda
 	return tu
 }
 
-// SetFromWalletID sets the "from_wallet" edge to the Wallet entity by ID.
-func (tu *TransactionUpdate) SetFromWalletID(id int) *TransactionUpdate {
-	tu.mutation.SetFromWalletID(id)
+// SetFromWalletID sets the "from_wallet_id" field.
+func (tu *TransactionUpdate) SetFromWalletID(i int) *TransactionUpdate {
+	tu.mutation.SetFromWalletID(i)
+	return tu
+}
+
+// SetNillableFromWalletID sets the "from_wallet_id" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableFromWalletID(i *int) *TransactionUpdate {
+	if i != nil {
+		tu.SetFromWalletID(*i)
+	}
+	return tu
+}
+
+// SetToWalletID sets the "to_wallet_id" field.
+func (tu *TransactionUpdate) SetToWalletID(i int) *TransactionUpdate {
+	tu.mutation.SetToWalletID(i)
+	return tu
+}
+
+// SetNillableToWalletID sets the "to_wallet_id" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableToWalletID(i *int) *TransactionUpdate {
+	if i != nil {
+		tu.SetToWalletID(*i)
+	}
 	return tu
 }
 
 // SetFromWallet sets the "from_wallet" edge to the Wallet entity.
 func (tu *TransactionUpdate) SetFromWallet(w *Wallet) *TransactionUpdate {
 	return tu.SetFromWalletID(w.ID)
-}
-
-// SetToWalletID sets the "to_wallet" edge to the Wallet entity by ID.
-func (tu *TransactionUpdate) SetToWalletID(id int) *TransactionUpdate {
-	tu.mutation.SetToWalletID(id)
-	return tu
 }
 
 // SetToWallet sets the "to_wallet" edge to the Wallet entity.
@@ -195,21 +211,37 @@ type TransactionUpdateOne struct {
 	mutation *TransactionMutation
 }
 
-// SetFromWalletID sets the "from_wallet" edge to the Wallet entity by ID.
-func (tuo *TransactionUpdateOne) SetFromWalletID(id int) *TransactionUpdateOne {
-	tuo.mutation.SetFromWalletID(id)
+// SetFromWalletID sets the "from_wallet_id" field.
+func (tuo *TransactionUpdateOne) SetFromWalletID(i int) *TransactionUpdateOne {
+	tuo.mutation.SetFromWalletID(i)
+	return tuo
+}
+
+// SetNillableFromWalletID sets the "from_wallet_id" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableFromWalletID(i *int) *TransactionUpdateOne {
+	if i != nil {
+		tuo.SetFromWalletID(*i)
+	}
+	return tuo
+}
+
+// SetToWalletID sets the "to_wallet_id" field.
+func (tuo *TransactionUpdateOne) SetToWalletID(i int) *TransactionUpdateOne {
+	tuo.mutation.SetToWalletID(i)
+	return tuo
+}
+
+// SetNillableToWalletID sets the "to_wallet_id" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableToWalletID(i *int) *TransactionUpdateOne {
+	if i != nil {
+		tuo.SetToWalletID(*i)
+	}
 	return tuo
 }
 
 // SetFromWallet sets the "from_wallet" edge to the Wallet entity.
 func (tuo *TransactionUpdateOne) SetFromWallet(w *Wallet) *TransactionUpdateOne {
 	return tuo.SetFromWalletID(w.ID)
-}
-
-// SetToWalletID sets the "to_wallet" edge to the Wallet entity by ID.
-func (tuo *TransactionUpdateOne) SetToWalletID(id int) *TransactionUpdateOne {
-	tuo.mutation.SetToWalletID(id)
-	return tuo
 }
 
 // SetToWallet sets the "to_wallet" edge to the Wallet entity.

@@ -27,8 +27,8 @@ func (wc *WalletCreate) SetAddress(s string) *WalletCreate {
 }
 
 // SetBalance sets the "balance" field.
-func (wc *WalletCreate) SetBalance(u uint) *WalletCreate {
-	wc.mutation.SetBalance(u)
+func (wc *WalletCreate) SetBalance(i int) *WalletCreate {
+	wc.mutation.SetBalance(i)
 	return wc
 }
 
@@ -107,6 +107,11 @@ func (wc *WalletCreate) check() error {
 	if _, ok := wc.mutation.Balance(); !ok {
 		return &ValidationError{Name: "balance", err: errors.New(`ent: missing required field "Wallet.balance"`)}
 	}
+	if v, ok := wc.mutation.Balance(); ok {
+		if err := wallet.BalanceValidator(v); err != nil {
+			return &ValidationError{Name: "balance", err: fmt.Errorf(`ent: validator failed for field "Wallet.balance": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -138,7 +143,7 @@ func (wc *WalletCreate) createSpec() (*Wallet, *sqlgraph.CreateSpec) {
 		_node.Address = value
 	}
 	if value, ok := wc.mutation.Balance(); ok {
-		_spec.SetField(wallet.FieldBalance, field.TypeUint, value)
+		_spec.SetField(wallet.FieldBalance, field.TypeInt, value)
 		_node.Balance = value
 	}
 	if nodes := wc.mutation.SentTransactionsIDs(); len(nodes) > 0 {

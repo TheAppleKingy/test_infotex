@@ -19,15 +19,17 @@ type Transaction struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Amount holds the value of the "amount" field.
-	Amount uint `json:"amount,omitempty"`
+	Amount int `json:"amount,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// FromWalletID holds the value of the "from_wallet_id" field.
+	FromWalletID int `json:"from_wallet_id,omitempty"`
+	// ToWalletID holds the value of the "to_wallet_id" field.
+	ToWalletID int `json:"to_wallet_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
-	Edges                        TransactionEdges `json:"edges"`
-	wallet_sent_transactions     *int
-	wallet_recieved_transactions *int
-	selectValues                 sql.SelectValues
+	Edges        TransactionEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
@@ -68,14 +70,10 @@ func (*Transaction) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case transaction.FieldID, transaction.FieldAmount:
+		case transaction.FieldID, transaction.FieldAmount, transaction.FieldFromWalletID, transaction.FieldToWalletID:
 			values[i] = new(sql.NullInt64)
 		case transaction.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case transaction.ForeignKeys[0]: // wallet_sent_transactions
-			values[i] = new(sql.NullInt64)
-		case transaction.ForeignKeys[1]: // wallet_recieved_transactions
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -101,7 +99,7 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				t.Amount = uint(value.Int64)
+				t.Amount = int(value.Int64)
 			}
 		case transaction.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -109,19 +107,17 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.CreatedAt = value.Time
 			}
-		case transaction.ForeignKeys[0]:
+		case transaction.FieldFromWalletID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field wallet_sent_transactions", value)
+				return fmt.Errorf("unexpected type %T for field from_wallet_id", values[i])
 			} else if value.Valid {
-				t.wallet_sent_transactions = new(int)
-				*t.wallet_sent_transactions = int(value.Int64)
+				t.FromWalletID = int(value.Int64)
 			}
-		case transaction.ForeignKeys[1]:
+		case transaction.FieldToWalletID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field wallet_recieved_transactions", value)
+				return fmt.Errorf("unexpected type %T for field to_wallet_id", values[i])
 			} else if value.Valid {
-				t.wallet_recieved_transactions = new(int)
-				*t.wallet_recieved_transactions = int(value.Int64)
+				t.ToWalletID = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -174,6 +170,12 @@ func (t *Transaction) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("from_wallet_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.FromWalletID))
+	builder.WriteString(", ")
+	builder.WriteString("to_wallet_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.ToWalletID))
 	builder.WriteByte(')')
 	return builder.String()
 }

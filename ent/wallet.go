@@ -19,7 +19,7 @@ type Wallet struct {
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// Balance holds the value of the "balance" field.
-	Balance uint `json:"balance,omitempty"`
+	Balance int `json:"balance,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WalletQuery when eager-loading is set.
 	Edges        WalletEdges `json:"edges"`
@@ -95,7 +95,7 @@ func (w *Wallet) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field balance", values[i])
 			} else if value.Valid {
-				w.Balance = uint(value.Int64)
+				w.Balance = int(value.Int64)
 			}
 		default:
 			w.selectValues.Set(columns[i], values[i])

@@ -35,7 +35,7 @@ type TransactionMutation struct {
 	op                 Op
 	typ                string
 	id                 *int
-	amount             *uint
+	amount             *int
 	addamount          *int
 	created_at         *time.Time
 	clearedFields      map[string]struct{}
@@ -147,13 +147,13 @@ func (m *TransactionMutation) IDs(ctx context.Context) ([]int, error) {
 }
 
 // SetAmount sets the "amount" field.
-func (m *TransactionMutation) SetAmount(u uint) {
-	m.amount = &u
+func (m *TransactionMutation) SetAmount(i int) {
+	m.amount = &i
 	m.addamount = nil
 }
 
 // Amount returns the value of the "amount" field in the mutation.
-func (m *TransactionMutation) Amount() (r uint, exists bool) {
+func (m *TransactionMutation) Amount() (r int, exists bool) {
 	v := m.amount
 	if v == nil {
 		return
@@ -164,7 +164,7 @@ func (m *TransactionMutation) Amount() (r uint, exists bool) {
 // OldAmount returns the old "amount" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAmount(ctx context.Context) (v uint, err error) {
+func (m *TransactionMutation) OldAmount(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
 	}
@@ -178,12 +178,12 @@ func (m *TransactionMutation) OldAmount(ctx context.Context) (v uint, err error)
 	return oldValue.Amount, nil
 }
 
-// AddAmount adds u to the "amount" field.
-func (m *TransactionMutation) AddAmount(u int) {
+// AddAmount adds i to the "amount" field.
+func (m *TransactionMutation) AddAmount(i int) {
 	if m.addamount != nil {
-		*m.addamount += u
+		*m.addamount += i
 	} else {
-		m.addamount = &u
+		m.addamount = &i
 	}
 }
 
@@ -238,27 +238,87 @@ func (m *TransactionMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
-// SetFromWalletID sets the "from_wallet" edge to the Wallet entity by id.
-func (m *TransactionMutation) SetFromWalletID(id int) {
-	m.from_wallet = &id
+// SetFromWalletID sets the "from_wallet_id" field.
+func (m *TransactionMutation) SetFromWalletID(i int) {
+	m.from_wallet = &i
+}
+
+// FromWalletID returns the value of the "from_wallet_id" field in the mutation.
+func (m *TransactionMutation) FromWalletID() (r int, exists bool) {
+	v := m.from_wallet
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFromWalletID returns the old "from_wallet_id" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldFromWalletID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFromWalletID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFromWalletID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFromWalletID: %w", err)
+	}
+	return oldValue.FromWalletID, nil
+}
+
+// ResetFromWalletID resets all changes to the "from_wallet_id" field.
+func (m *TransactionMutation) ResetFromWalletID() {
+	m.from_wallet = nil
+}
+
+// SetToWalletID sets the "to_wallet_id" field.
+func (m *TransactionMutation) SetToWalletID(i int) {
+	m.to_wallet = &i
+}
+
+// ToWalletID returns the value of the "to_wallet_id" field in the mutation.
+func (m *TransactionMutation) ToWalletID() (r int, exists bool) {
+	v := m.to_wallet
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldToWalletID returns the old "to_wallet_id" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldToWalletID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldToWalletID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldToWalletID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldToWalletID: %w", err)
+	}
+	return oldValue.ToWalletID, nil
+}
+
+// ResetToWalletID resets all changes to the "to_wallet_id" field.
+func (m *TransactionMutation) ResetToWalletID() {
+	m.to_wallet = nil
 }
 
 // ClearFromWallet clears the "from_wallet" edge to the Wallet entity.
 func (m *TransactionMutation) ClearFromWallet() {
 	m.clearedfrom_wallet = true
+	m.clearedFields[transaction.FieldFromWalletID] = struct{}{}
 }
 
 // FromWalletCleared reports if the "from_wallet" edge to the Wallet entity was cleared.
 func (m *TransactionMutation) FromWalletCleared() bool {
 	return m.clearedfrom_wallet
-}
-
-// FromWalletID returns the "from_wallet" edge ID in the mutation.
-func (m *TransactionMutation) FromWalletID() (id int, exists bool) {
-	if m.from_wallet != nil {
-		return *m.from_wallet, true
-	}
-	return
 }
 
 // FromWalletIDs returns the "from_wallet" edge IDs in the mutation.
@@ -277,27 +337,15 @@ func (m *TransactionMutation) ResetFromWallet() {
 	m.clearedfrom_wallet = false
 }
 
-// SetToWalletID sets the "to_wallet" edge to the Wallet entity by id.
-func (m *TransactionMutation) SetToWalletID(id int) {
-	m.to_wallet = &id
-}
-
 // ClearToWallet clears the "to_wallet" edge to the Wallet entity.
 func (m *TransactionMutation) ClearToWallet() {
 	m.clearedto_wallet = true
+	m.clearedFields[transaction.FieldToWalletID] = struct{}{}
 }
 
 // ToWalletCleared reports if the "to_wallet" edge to the Wallet entity was cleared.
 func (m *TransactionMutation) ToWalletCleared() bool {
 	return m.clearedto_wallet
-}
-
-// ToWalletID returns the "to_wallet" edge ID in the mutation.
-func (m *TransactionMutation) ToWalletID() (id int, exists bool) {
-	if m.to_wallet != nil {
-		return *m.to_wallet, true
-	}
-	return
 }
 
 // ToWalletIDs returns the "to_wallet" edge IDs in the mutation.
@@ -350,12 +398,18 @@ func (m *TransactionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.amount != nil {
 		fields = append(fields, transaction.FieldAmount)
 	}
 	if m.created_at != nil {
 		fields = append(fields, transaction.FieldCreatedAt)
+	}
+	if m.from_wallet != nil {
+		fields = append(fields, transaction.FieldFromWalletID)
+	}
+	if m.to_wallet != nil {
+		fields = append(fields, transaction.FieldToWalletID)
 	}
 	return fields
 }
@@ -369,6 +423,10 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 		return m.Amount()
 	case transaction.FieldCreatedAt:
 		return m.CreatedAt()
+	case transaction.FieldFromWalletID:
+		return m.FromWalletID()
+	case transaction.FieldToWalletID:
+		return m.ToWalletID()
 	}
 	return nil, false
 }
@@ -382,6 +440,10 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldAmount(ctx)
 	case transaction.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case transaction.FieldFromWalletID:
+		return m.OldFromWalletID(ctx)
+	case transaction.FieldToWalletID:
+		return m.OldToWalletID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Transaction field %s", name)
 }
@@ -392,7 +454,7 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case transaction.FieldAmount:
-		v, ok := value.(uint)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -404,6 +466,20 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case transaction.FieldFromWalletID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFromWalletID(v)
+		return nil
+	case transaction.FieldToWalletID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetToWalletID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction field %s", name)
@@ -474,6 +550,12 @@ func (m *TransactionMutation) ResetField(name string) error {
 		return nil
 	case transaction.FieldCreatedAt:
 		m.ResetCreatedAt()
+		return nil
+	case transaction.FieldFromWalletID:
+		m.ResetFromWalletID()
+		return nil
+	case transaction.FieldToWalletID:
+		m.ResetToWalletID()
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction field %s", name)
@@ -578,7 +660,7 @@ type WalletMutation struct {
 	typ                          string
 	id                           *int
 	address                      *string
-	balance                      *uint
+	balance                      *int
 	addbalance                   *int
 	clearedFields                map[string]struct{}
 	sent_transactions            map[int]struct{}
@@ -727,13 +809,13 @@ func (m *WalletMutation) ResetAddress() {
 }
 
 // SetBalance sets the "balance" field.
-func (m *WalletMutation) SetBalance(u uint) {
-	m.balance = &u
+func (m *WalletMutation) SetBalance(i int) {
+	m.balance = &i
 	m.addbalance = nil
 }
 
 // Balance returns the value of the "balance" field in the mutation.
-func (m *WalletMutation) Balance() (r uint, exists bool) {
+func (m *WalletMutation) Balance() (r int, exists bool) {
 	v := m.balance
 	if v == nil {
 		return
@@ -744,7 +826,7 @@ func (m *WalletMutation) Balance() (r uint, exists bool) {
 // OldBalance returns the old "balance" field's value of the Wallet entity.
 // If the Wallet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletMutation) OldBalance(ctx context.Context) (v uint, err error) {
+func (m *WalletMutation) OldBalance(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBalance is only allowed on UpdateOne operations")
 	}
@@ -758,12 +840,12 @@ func (m *WalletMutation) OldBalance(ctx context.Context) (v uint, err error) {
 	return oldValue.Balance, nil
 }
 
-// AddBalance adds u to the "balance" field.
-func (m *WalletMutation) AddBalance(u int) {
+// AddBalance adds i to the "balance" field.
+func (m *WalletMutation) AddBalance(i int) {
 	if m.addbalance != nil {
-		*m.addbalance += u
+		*m.addbalance += i
 	} else {
-		m.addbalance = &u
+		m.addbalance = &i
 	}
 }
 
@@ -973,7 +1055,7 @@ func (m *WalletMutation) SetField(name string, value ent.Value) error {
 		m.SetAddress(v)
 		return nil
 	case wallet.FieldBalance:
-		v, ok := value.(uint)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

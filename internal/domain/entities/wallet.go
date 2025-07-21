@@ -1,7 +1,7 @@
 package entities
 
 type Wallet struct {
-	ID      uint
+	ID      int
 	Address string
-	Balance uint
+	Balance int
 }

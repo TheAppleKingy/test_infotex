@@ -18,7 +18,7 @@ func init() {
 	// transactionDescAmount is the schema descriptor for amount field.
 	transactionDescAmount := transactionFields[0].Descriptor()
 	// transaction.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
-	transaction.AmountValidator = transactionDescAmount.Validators[0].(func(uint) error)
+	transaction.AmountValidator = transactionDescAmount.Validators[0].(func(int) error)
 	// transactionDescCreatedAt is the schema descriptor for created_at field.
 	transactionDescCreatedAt := transactionFields[1].Descriptor()
 	// transaction.DefaultCreatedAt holds the default value on creation for the created_at field.
@@ -29,4 +29,8 @@ func init() {
 	walletDescAddress := walletFields[0].Descriptor()
 	// wallet.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	wallet.AddressValidator = walletDescAddress.Validators[0].(func(string) error)
+	// walletDescBalance is the schema descriptor for balance field.
+	walletDescBalance := walletFields[1].Descriptor()
+	// wallet.BalanceValidator is a validator for the "balance" field. It is called by the builders before save.
+	wallet.BalanceValidator = walletDescBalance.Validators[0].(func(int) error)
 }

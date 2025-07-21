@@ -28,14 +28,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "transaction" package.
 	SentTransactionsInverseTable = "transactions"
 	// SentTransactionsColumn is the table column denoting the sent_transactions relation/edge.
-	SentTransactionsColumn = "wallet_sent_transactions"
+	SentTransactionsColumn = "from_wallet_id"
 	// RecievedTransactionsTable is the table that holds the recieved_transactions relation/edge.
 	RecievedTransactionsTable = "transactions"
 	// RecievedTransactionsInverseTable is the table name for the Transaction entity.
 	// It exists in this package in order to avoid circular dependency with the "transaction" package.
 	RecievedTransactionsInverseTable = "transactions"
 	// RecievedTransactionsColumn is the table column denoting the recieved_transactions relation/edge.
-	RecievedTransactionsColumn = "wallet_recieved_transactions"
+	RecievedTransactionsColumn = "to_wallet_id"
 )
 
 // Columns holds all SQL columns for wallet fields.
@@ -58,6 +58,8 @@ func ValidColumn(column string) bool {
 var (
 	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	AddressValidator func(string) error
+	// BalanceValidator is a validator for the "balance" field. It is called by the builders before save.
+	BalanceValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Wallet queries.
