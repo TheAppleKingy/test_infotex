@@ -22,6 +22,9 @@ func (ts *TransactionService) convert(amount float64) (int, error) {
 }
 
 func (ts *TransactionService) TransferMoney(ctx context.Context, fromAddr string, toAddr string, amount float64) error {
+	if fromAddr == toAddr {
+		return errors.New("cannot send money youself")
+	}
 	convertedAmount, err := ts.convert(amount)
 	if err != nil {
 		return err
